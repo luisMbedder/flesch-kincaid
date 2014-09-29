@@ -8,6 +8,8 @@
  */
 
 #include <iostream>
+#include <iterator>
+#include <regex>
 #include <fstream>
 #include "console.h"
 #include <string>
@@ -25,21 +27,37 @@ int main() {
     BOOST_FOREACH (const string& t, tokens) {
         cout << t << "." << endl;
     }*/
+	std::vector<string> list;
 	string str;
-	boost::char_separator<char> sep("'");
+	boost::char_separator<char> sep(" ",",.-!?\/|:;^&",boost::drop_empty_tokens);//("-:;.,!&?"," ","'");
+
+	//std::tr1::regex sepa( " " );
+
 	ifstream scoresFile;
 	promptForFile(scoresFile, "input file:");
+
+
 	while(!scoresFile.eof())
 {
-    scoresFile >> str;
+   // scoresFile >> str;
 	getline(scoresFile,str);
 	boost::tokenizer< boost::char_separator<char> > tokens(str,sep);
+
+//	 std::copy(std::tr1::sregex_token_iterator(str.begin(), str.end(), sepa, -1),
+  //      std::tr1::sregex_token_iterator(), 
+  //      std::ostream_iterator<std::string>(std::cout, "\n"));
 	//for(Tok::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter)
    //  std::cout << "<" << *tok_iter << "> ";
+	   boost::tokenizer<> tok(str);
+ //  for(boost::tokenizer<>::iterator beg=tok.begin(); beg!=tok.end();++beg){
+//       cout << *beg << endl;//"\n";
+//   }
+
 	BOOST_FOREACH (const string& t, tokens) {
         cout << t << endl;
+		list.push_back(t);
     }
-   // list.push_back(str);
+    
 }
 
 	getline(scoresFile,str);
