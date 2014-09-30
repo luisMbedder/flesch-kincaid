@@ -18,53 +18,111 @@
 using namespace std;
 
 string promptForFile(ifstream & infile, string prompt = "");
+void countWords(std::vector<string> *strPtr);
+void countSyllables(std::vector<string> *strPtr);
+bool isVowel(char c);
+int wordCount=0;
+int punctuationCount=0;
+int syllables=0;
 
 int main() {
- /*     string text = "token, test   string";
 
-	boost::char_separator<char> sep(", ");
-	boost::tokenizer< boost::char_separator<char> > tokens(text, sep);
-    BOOST_FOREACH (const string& t, tokens) {
-        cout << t << "." << endl;
-    }*/
 	std::vector<string> list;
 	string str;
-	boost::char_separator<char> sep(" ",",.-!?\/|:;^&",boost::drop_empty_tokens);//("-:;.,!&?"," ","'");
-
-	//std::tr1::regex sepa( " " );
-
+	boost::char_separator<char> sep(" ",",.-!?\/|:;^&",boost::drop_empty_tokens);
 	ifstream scoresFile;
+
 	promptForFile(scoresFile, "input file:");
 
 
 	while(!scoresFile.eof())
-{
-   // scoresFile >> str;
-	getline(scoresFile,str);
-	boost::tokenizer< boost::char_separator<char> > tokens(str,sep);
+	{
+		getline(scoresFile,str);
+		boost::tokenizer< boost::char_separator<char> > tokens(str,sep);
+		boost::tokenizer<> tok(str);
 
-//	 std::copy(std::tr1::sregex_token_iterator(str.begin(), str.end(), sepa, -1),
-  //      std::tr1::sregex_token_iterator(), 
-  //      std::ostream_iterator<std::string>(std::cout, "\n"));
-	//for(Tok::iterator tok_iter = tok.begin(); tok_iter != tok.end(); ++tok_iter)
-   //  std::cout << "<" << *tok_iter << "> ";
-	   boost::tokenizer<> tok(str);
- //  for(boost::tokenizer<>::iterator beg=tok.begin(); beg!=tok.end();++beg){
-//       cout << *beg << endl;//"\n";
-//   }
+		BOOST_FOREACH (const string& t, tokens) {
+			//cout << t << endl;
+			list.push_back(t);
+			
+		}
+	}
 
-	BOOST_FOREACH (const string& t, tokens) {
-        cout << t << endl;
-		list.push_back(t);
-    }
-    
-}
-
-	getline(scoresFile,str);
+	countWords(&list);
+	countSyllables(&list);
+	std::cout<< "Words: "<<wordCount<<endl;
+	std::cout<< "Sentences: "<<punctuationCount<<endl;
+	std::cout<< "Syllables: "<<syllables<<endl;
 	
 
     return 0;
 }
+
+void countWords(std::vector<string> *strPtr){
+	
+	std::vector<string> list = *strPtr;
+	std::vector<string>::iterator listIterator;
+	for(listIterator =list.begin();listIterator!= list.end();listIterator++){
+		string str = *listIterator;
+		if(isalpha(str[0]))
+		{
+			wordCount++;
+		}
+		else if((str[0] == '.') || (str[0] == '!') || (str[0] == '?'))
+		{
+			punctuationCount++;
+		}
+	}
+}
+
+void countSyllables(std::vector<string> *strPtr){
+
+		std::vector<string> list = *strPtr;
+		std::vector<string>::iterator listIterator;
+		int i;
+		for(listIterator =list.begin();listIterator!= list.end();listIterator++){
+			string str =*listIterator;
+			for(i=0;i<str.length();i++){
+				char c = tolower(str[i]);
+				if(isVowel(c))
+				{
+					if(i==0)
+					{
+							syllables++;
+					}
+					else{
+							if((!isVowel(str[i-1]))&&!((c=='e')&&(i==str.length()-1)))
+								syllables++;
+							else if((c=='e')&&(i==str.length()-1))
+								syllables++;
+					}
+					
+				}
+
+			}
+
+		}
+}
+
+
+
+bool isVowel(char c){
+
+	switch(c){
+		case 'a':
+		case 'e':
+		case 'i':
+		case 'o':
+		case 'u':
+		case 'y':
+			return true;
+		default:
+			return false;
+
+	}
+
+}
+
 
 
 string promptForFile(std::ifstream & infile, std::string prompt){
